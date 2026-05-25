@@ -30,10 +30,10 @@ public class Main extends Application {
         grid.add(new Label("OS Name:"), 0, 0);
         grid.add(OsNameField, 1, 0);
 
-        grid.add(new Label("OS Version:"), 0, 0);
+        grid.add(new Label("OS Version:"), 0, 1);
         grid.add(OsVersionField, 1, 1);
 
-        grid.add(new Label("OS Architecture: "), 0, 0);
+        grid.add(new Label("OS Architecture: "), 0, 2);
         grid.add(OsArchField, 1, 2);
 
         Button btn_reload = new Button("Get OS Info");
