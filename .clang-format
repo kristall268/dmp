@@ -1,0 +1,90 @@
+
+BasedOnStyle: LLVM
+Language:     Cpp
+Standard:     c++23
+
+# ────────────────────────────────────────
+#  Indentation
+# ────────────────────────────────────────
+IndentWidth:                  2
+TabWidth:                     2
+UseTab:                       Never
+ContinuationIndentWidth:      4
+IndentCaseLabels:             true
+IndentPPDirectives:           BeforeHash
+NamespaceIndentation:         None
+
+# ────────────────────────────────────────
+#  Line length
+# ────────────────────────────────────────
+ColumnLimit:                  100
+ReflowComments:               true
+
+# ────────────────────────────────────────
+#  Braces
+# ────────────────────────────────────────
+BreakBeforeBraces:            Attach
+BraceWrapping:
+  AfterFunction:              false
+  AfterClass:                 false
+  AfterControlStatement:      Never
+  AfterEnum:                  false
+  AfterStruct:                false
+  BeforeElse:                 false
+
+# ────────────────────────────────────────
+#  Spacing
+# ────────────────────────────────────────
+SpaceBeforeParens:            ControlStatements
+SpaceInEmptyParentheses:      false
+SpacesInAngles:               Never
+SpacesInSquareBrackets:       false
+SpaceAfterCStyleCast:         false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceAroundPointerQualifiers: Default
+PointerAlignment:             Left
+
+# ────────────────────────────────────────
+#  Include sorting
+# ────────────────────────────────────────
+SortIncludes:                 CaseSensitive
+IncludeBlocks:                Regroup
+IncludeCategories:
+  # System C headers
+  - Regex:    "^<(stdlib|stdio|string|stdint|stdbool|errno|unistd|fcntl|sys/).*\\.h>"
+    Priority: 3
+  # System C++ headers
+  - Regex:    "^<[a-z_]+>"
+    Priority: 2
+  # Project headers
+  - Regex:    "^\".*\""
+    Priority: 1
+
+# ────────────────────────────────────────
+#  Alignment
+# ────────────────────────────────────────
+AlignConsecutiveAssignments:  Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveMacros:       Consecutive
+AlignTrailingComments:
+  Kind:           Always
+  OverEmptyLines: 1
+
+# ────────────────────────────────────────
+#  Functions & parameters
+# ────────────────────────────────────────
+AllowShortFunctionsOnASingleLine:   Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine:       false
+AllowShortCaseLabelsOnASingleLine:  false
+BinPackArguments:                   false
+BinPackParameters:                  false
+AlignAfterOpenBracket:              Align
+
+# ────────────────────────────────────────
+#  Modern C++ / C++23
+# ────────────────────────────────────────
+Cpp11BracedListStyle:         true
+FixNamespaceComments:         true
+SortUsingDeclarations:        true

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ─────────────────────────────────────────
+         Project coordinates
+    ───────────────────────────────────────── -->
+    <groupId>org.dmp</groupId>
+    <artifactId>driver-manager-pro</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Driver Manager Pro</name>
+    <description>Cross-platform driver management utility for Windows and Linux</description>
+
+    <!-- ─────────────────────────────────────────
+         Properties
+    ───────────────────────────────────────── -->
+    <properties>
+        <!-- Java -->
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Dependencies -->
+        <javafx.version>21.0.4</javafx.version>
+        <jna.version>5.14.0</jna.version>
+
+        <!-- Plugins -->
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
+        <maven.shade.plugin.version>3.5.3</maven.shade.plugin.version>
+        <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
+    </properties>
+
+    <!-- ─────────────────────────────────────────
+         Dependencies
+    ───────────────────────────────────────── -->
+    <dependencies>
+
+        <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- JNA — Java Native Access (bridge to C/C++ daemon) -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>${jna.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>${jna.version}</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ─────────────────────────────────────────
+         Build
+    ───────────────────────────────────────── -->
+    <build>
+        <plugins>
+
+            <!-- Java compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
+            <!-- JavaFX runner (mvn javafx:run) -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>${javafx.maven.plugin.version}</version>
+                <configuration>
+                    <mainClass>org.dmp.AppLauncher</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Standard JAR (без зависимостей) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.dmp.AppLauncher</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <finalName>driver-manager-pro</finalName>
+                </configuration>
+            </plugin>
+
+            <!-- Fat JAR — все зависимости внутри одного .jar
+                 Запуск: mvn package
+                 Результат: target/driver-manager-pro-fat.jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>driver-manager-pro-fat</finalName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                            <transformers>
+                                <!-- Прописываем точку входа -->
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.dmp.AppLauncher</mainClass>
+                                </transformer>
+                                <!-- Объединяем META-INF/services (нужно для JavaFX) -->
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                            </transformers>
+
+                            <filters>
+                                <!-- Убираем подписи зависимостей (иначе JVM откажет в запуске) -->
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <!-- ─────────────────────────────────────────
+         Profiles
+    ───────────────────────────────────────── -->
+    <profiles>
+
+        <!-- Linux build -->
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <platform>linux</platform>
+            </properties>
+        </profile>
+
+        <!-- Windows build -->
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <platform>windows</platform>
+            </properties>
+        </profile>
+
+    </profiles>
+
+</project>
