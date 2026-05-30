@@ -2,16 +2,12 @@ cmake_minimum_required(VERSION 3.25)
 
 project(dmp-daemon
   VERSION   0.1.0
-  LANGUAGES C CXX
+  LANGUAGES CXX
 )
 
 # ────────────────────────────────────────
-#  Language standards
+#  Language standard
 # ────────────────────────────────────────
-set(CMAKE_C_STANDARD            11)
-set(CMAKE_C_STANDARD_REQUIRED   ON)
-set(CMAKE_C_EXTENSIONS          OFF)
-
 set(CMAKE_CXX_STANDARD          23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS        OFF)
@@ -40,9 +36,9 @@ message(STATUS "Building for platform: ${DMP_PLATFORM}")
 #  Sources — common (platform-independent)
 # ────────────────────────────────────────
 set(DMP_COMMON_SOURCES
-  src/main.c
-  src/ipc_server.c
-  src/dispatcher.c
+  src/main.cpp
+  src/ipc_server.cpp
+  src/dispatcher.cpp
 )
 
 # ────────────────────────────────────────
@@ -55,8 +51,8 @@ if(DMP_PLATFORM STREQUAL "windows")
   )
 elseif(DMP_PLATFORM STREQUAL "linux")
   set(DMP_PLATFORM_SOURCES
-    src/linux/driver_linux.c
-    src/linux/device_enum.c
+    src/linux/driver_linux.cpp
+    src/linux/device_enum.cpp
   )
 endif()
 
@@ -80,12 +76,12 @@ target_include_directories(dmp-daemon PRIVATE
 # ────────────────────────────────────────
 if(MSVC)
   target_compile_options(dmp-daemon PRIVATE
-    /W4           # High warning level
-    /WX           # Warnings as errors
-    /utf-8        # Source and execution charset UTF-8
-    /permissive-  # Strict conformance
+    /W4
+    /WX
+    /utf-8
+    /permissive-
   )
-elseif(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   target_compile_options(dmp-daemon PRIVATE
     -Wall
     -Wextra
@@ -101,8 +97,8 @@ endif()
 if(DMP_PLATFORM STREQUAL "windows")
   target_compile_definitions(dmp-daemon PRIVATE
     DMP_PLATFORM_WINDOWS
-    WIN32_LEAN_AND_MEAN   # Exclude rarely-used Windows headers
-    NOMINMAX              # Prevent min/max macro pollution
+    WIN32_LEAN_AND_MEAN
+    NOMINMAX
     UNICODE
     _UNICODE
   )
@@ -118,11 +114,10 @@ endif()
 # ────────────────────────────────────────
 if(DMP_PLATFORM STREQUAL "windows")
   target_link_libraries(dmp-daemon PRIVATE
-    setupapi    # Driver installation
-    cfgmgr32    # Device enumeration
+    setupapi
+    cfgmgr32
   )
 elseif(DMP_PLATFORM STREQUAL "linux")
-  # libudev via pkg-config
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(UDEV REQUIRED libudev)
 

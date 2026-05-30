@@ -3,7 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
-
+.cache
 ### IntelliJ IDEA ###
 .idea/
 *.iws
